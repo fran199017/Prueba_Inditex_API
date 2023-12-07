@@ -23,7 +23,7 @@ http://localhost:8080/swagger-ui/index.html
 
 ### Endpoint de la prueba
 http://localhost:8080/swagger-ui/index.html#/prices-controller/findAll
-- NOTA: Si se utiliza algún endpoint antes de verificar la prueba para crear o actualizar campos, obviamente los tests fallarán al haber cambiado las rows de la prueba.
+- NOTA: Si se utiliza alguna otro endpoint, los tests podrían fallar al haber cambiado campos de la prueba.
 1) Para este endpoint (aunque queda explicado en OpenAPI), todos los campos son String, para poder aplicarles ciertos filtros y orderByPriority si se desea filtrar por prioridad o no para mayor flexibilidad al endpoint.
 2) Los filtros son los siguientes: eq:, neq:, lt:, gt:, y bw: (este último solo para fechas).
 3) Un ejemplo del campo date con formato yyyyMMddHHmmss podría ser eq:20201230235959 (. Este ejemplo aplicará un filtro EQUALS sobre el campo startDate. (yo habría aplicado 2 campos fechas para decidir si queremos comparar startDate, 
