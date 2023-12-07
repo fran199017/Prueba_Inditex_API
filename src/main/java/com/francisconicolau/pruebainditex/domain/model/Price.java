@@ -19,9 +19,8 @@ import java.time.LocalDateTime;
 public class Price {
 
     @Id
-//    @ApiModelProperty(value = "ID", required = true)
     @Column(name = "ID", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  //To add prices h2 database
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
 
     @Column(name = "BRAND_ID", nullable = false)

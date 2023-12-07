@@ -60,9 +60,9 @@ public class PricesServiceImpl implements PricesService {
     @Autowired
     private ServiceProperties properties;
 
-    public List<PriceDTO> findAll(String date, String productId, String brandId, Boolean orderByPriority) throws Exception {
+    public List<PriceDTO> findAll(String date, String productId, String brandId, boolean orderByPriority) throws CustomException {
         var prices = pricesRepository.findAll(getSpecifications(date, productId, brandId));
-        return !orderByPriority && !prices.isEmpty()
+        return !orderByPriority && prices != null && !prices.isEmpty()
                 ? mapper.fromEntityList(prices)
                 : mapper.fromEntityList(prices.stream()
                 .max(Comparator.comparingInt(Price::getPriority))
@@ -126,7 +126,7 @@ public class PricesServiceImpl implements PricesService {
         throw new CustomException(ServicePropertyConst.BRAND_NO_EXISTENTE, properties.getStatusMessage(ServicePropertyConst.BRAND_NO_EXISTENTE));
     }
 
-    private Specification<Price> getSpecifications(String date, String productId, String brandId) throws Exception {
+    private Specification<Price> getSpecifications(String date, String productId, String brandId) throws CustomException {
         List<Specification<Price>> specifications = new ArrayList<>();
         if (date != null && !date.isEmpty()) {
             specifications.add(splitFilterAndGetSpec(date, START_DATE));
@@ -189,8 +189,8 @@ public class PricesServiceImpl implements PricesService {
 
         return (Root<Price> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
                 cb.and(
-                        cb.lessThanOrEqualTo(root.get("startDate"), value),
-                        cb.greaterThanOrEqualTo(root.get("endDate"), value)
+                        cb.lessThanOrEqualTo(root.get(START_DATE), value),
+                        cb.greaterThanOrEqualTo(root.get(END_DATE), value)
                 );
     }
 

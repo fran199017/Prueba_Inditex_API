@@ -6,6 +6,7 @@ import com.francisconicolau.pruebainditex.domain.model.Price;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -31,7 +32,7 @@ public class PricesMapperImpl implements PricesMapper {
     @Override
     public List<PriceDTO> fromEntityList(List<Price> e) {
         if (e == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         var list = new ArrayList<PriceDTO>(e.size());
