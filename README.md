@@ -1,4 +1,4 @@
-## SpringBoot_PricesAPI
+## Prices API - Prueba Inditex
 ### Descripción general
 API basada en la prueba de Inditex bajo arquitectura hexagonal, con version Java 17 y Spring 3.2.0, bbdd H2 y OpenAPI para la realización de pruebas y manejo de excepciones.
 ### Notas sobre el proyecto
@@ -17,7 +17,7 @@ búsquedas con cualquier filtro que el usuario desease asignar y no solo lo que 
 - url: jdbc:h2:mem:testdb
 - username: sa
 - password:
-- 
+
 ### Swagger URL
 http://localhost:8080/swagger-ui/index.html
 
