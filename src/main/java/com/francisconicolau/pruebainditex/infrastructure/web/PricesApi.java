@@ -20,7 +20,7 @@ import java.util.Objects;
 public class PricesApi {
 
     private static final String NOT_FOUND_PRICES = "Price not found";
-
+    public static final String PRECIO_NO_CREADO = "PRECIO NO CREADO";
     private static final Logger log = LoggerFactory.getLogger(PricesApi.class);
 
 
@@ -54,11 +54,7 @@ public class PricesApi {
     public ResponseEntity<?> createPrice(@Valid @RequestBody CreatePriceRequestDTO createPriceDTO
     ) {
         try {
-            var pricesDto = pricesService.createNewPrice(createPriceDTO);
-            if (pricesDto != null) {
-                return new ResponseEntity<>(pricesDto, HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(Objects.requireNonNullElse(pricesService.createNewPrice(createPriceDTO), PRECIO_NO_CREADO), HttpStatus.OK);
         } catch (CustomException e) {
             log.error(e.getMessage(), e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -70,8 +66,7 @@ public class PricesApi {
     public ResponseEntity<?> updatePrice(@Valid @RequestBody CreatePriceRequestDTO createPriceDTO,
                                          @PathVariable int id) {
         try {
-            var price = pricesService.updatePrice(id, createPriceDTO);
-            return new ResponseEntity<>(Objects.requireNonNullElse(price, NOT_FOUND_PRICES), HttpStatus.OK);
+            return new ResponseEntity<>(Objects.requireNonNullElse(pricesService.updatePrice(id, createPriceDTO), NOT_FOUND_PRICES), HttpStatus.OK);
         } catch (CustomException e) {
             log.error(e.getMessage(), e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);

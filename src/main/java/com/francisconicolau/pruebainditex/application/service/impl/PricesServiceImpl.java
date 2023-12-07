@@ -62,7 +62,7 @@ public class PricesServiceImpl implements PricesService {
 
     public List<PriceDTO> findAll(String date, String productId, String brandId, boolean orderByPriority) throws CustomException {
         var prices = pricesRepository.findAll(getSpecifications(date, productId, brandId));
-        return !orderByPriority && prices != null && !prices.isEmpty()
+        return !orderByPriority && !prices.isEmpty()
                 ? mapper.fromEntityList(prices)
                 : mapper.fromEntityList(prices.stream()
                 .max(Comparator.comparingInt(Price::getPriority))
