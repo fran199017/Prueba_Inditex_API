@@ -7,16 +7,20 @@ API basada en la prueba de Inditex bajo arquitectura hexagonal, con version Java
 búsquedas con cualquier filtro que el usuario desease asignar.
 - Para mayor legibilidad yo habría quitado las horas, pero como en bbdd tiene que venir
   con las horas he decidido compararlas también.
+- He considerado la lógica de servicio de la entity Brand, dado que sería repetir información innecesariamente para la prueba.
 ## Pautas a seguir
+- Hacer git clone https://github.com/fran199017/Prueba_Inditex_API.git
+- Abrir el proyecto en la raiz ../pruebainditex
+- Hacer mvn clean package
+- Ejecutar java -jar target/pruebainditex-0.0.1-SNAPSHOT.jar
 
-## Instrucciones de uso
-### H2 database instructions.
-- console_url: http://localhost:8080/h2-console
+## Base de datos H2 instrucciones.
+- URL: http://localhost:8080/h2-console
 - url: jdbc:h2:mem:testdb
 - username: sa
 - password:
 
-### Swagger.
+## Swagger URL.
 http://localhost:8080/swagger-ui/index.html
 
 ### Endpoint de la prueba

@@ -50,7 +50,7 @@ public class PricesApi {
 
 
     @PostMapping(value = "prices/create", produces = "application/json", consumes = "application/json")
-    @Operation(summary = "Crear precio", description = "Crea un nuevo precio.")
+    @Operation(summary = "Crea un nuevo precio")
     public ResponseEntity<?> createPrice(@Valid @RequestBody CreatePriceRequestDTO createPriceDTO
     ) {
         try {
@@ -80,6 +80,7 @@ public class PricesApi {
 
 
     @GetMapping(value = "prices/{id}")
+    @Operation(summary = "Devuelve un precio por su ID")
     public ResponseEntity<Object> findById(@PathVariable int id) {
         try {
             var price = pricesService.getById(id);
@@ -91,6 +92,7 @@ public class PricesApi {
     }
 
     @DeleteMapping(value = "prices/{id}")
+    @Operation(summary = "Borra un precio por su ID")
     public ResponseEntity<Void> deletePrice(@PathVariable int id) {
         try {
             pricesService.deletePrice(id);

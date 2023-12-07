@@ -1,5 +1,6 @@
 package com.francisconicolau.pruebainditex.application.service;
 
+import com.francisconicolau.pruebainditex.application.dto.CreatePriceRequestDTO;
 import com.francisconicolau.pruebainditex.application.exception.CustomException;
 import com.francisconicolau.pruebainditex.application.service.impl.PricesServiceImpl;
 import com.francisconicolau.pruebainditex.infrastructure.config.ServiceProperties;
@@ -17,8 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
@@ -185,7 +185,7 @@ class PricesServiceTest {
     }
 
     @Test
-    @DisplayName("Tests con filtros not equals less than y greather than")
+    @DisplayName("Test 6.1: con filtros not equals less than y greather than")
     void optional_test6_1() throws Exception {
         var date = "neq:20210614000000";
         var productId = "gt:35900";
@@ -203,7 +203,7 @@ class PricesServiceTest {
     }
 
     @Test
-    @DisplayName("Tests con filtro erroneo")
+    @DisplayName("Test 7: con filtro erroneo")
     void optional_test7_bad_filter() {
         var date = "ac:20210614000000";
 
@@ -212,7 +212,7 @@ class PricesServiceTest {
     }
 
     @Test
-    @DisplayName("Tests con filtro erroneo")
+    @DisplayName("Test 8: No filtro")
     void optional_test8_no_filter() {
         var date = "20210614000000";
         CustomException exception = assertThrows(CustomException.class, () -> service.findAll(date, null, null, false));
@@ -220,11 +220,85 @@ class PricesServiceTest {
     }
 
     @Test
-    @DisplayName("Test error de formato fecha, dia 32")
-    void optional_test8_error_date_format() {
+    @DisplayName("Test 8.1: error de formato fecha, dia 32")
+    void optional_test8_1_error_date_format() {
         var date = "eq:20210632000000";
         CustomException exception = assertThrows(CustomException.class, () -> service.findAll(date, null, null, false));
         assertEquals(properties.getStatusMessage(ServicePropertyConst.DATE_FORMAT_ERROR), exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Test 9: by id OK")
+    void get_by_id_ok() {
+        var actual = service.getById(1);
+        assertEquals(1, actual.getBrandId());
+        assertEquals(35455, actual.getProductId());
+        assertEquals(BigDecimal.valueOf(35.5), actual.getPrice());
+        assertEquals(LocalDateTime.parse("2020-06-14T00:00:00", formatter), actual.getStartDate());
+        assertEquals(LocalDateTime.parse("2020-12-31T23:59:59", formatter), actual.getEndDate());
+    }
+
+    @Test
+    @DisplayName("Test 10: by id not found")
+    void get_by_id_not_found() {
+        var actual = service.getById(100);
+        assertNull(actual);
+    }
+
+    @Test
+    @DisplayName("Test 11: create ok")
+    void create_new_price_ok() {
+        var dto = getCreatePriceRequestDTO(2);
+        var actual = service.createNewPrice(dto);
+        assertEquals(2, actual.getBrandId());
+        assertEquals(36002, actual.getProductId());
+        assertEquals(BigDecimal.valueOf(10.0), actual.getPrice());
+        assertEquals(LocalDateTime.parse("2023-01-01T00:00:00", formatter), actual.getStartDate());
+        assertEquals(LocalDateTime.parse("2023-01-01T23:59:59", formatter), actual.getEndDate());
+    }
+
+
+    @Test
+    @DisplayName("Test 12: create error brand inexistente")
+    void create_new_price_error() {
+        var dto = getCreatePriceRequestDTO(4);
+        var exception = assertThrows(CustomException.class, () -> service.createNewPrice(dto));
+        assertEquals(properties.getStatusMessage(ServicePropertyConst.BRAND_NO_EXISTENTE), exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Test 13: update ok")
+    void update_price_ok() {
+        var dto = getCreatePriceRequestDTO(2);
+        var actual = service.updatePrice(7, dto);
+        assertEquals(2, actual.getBrandId());
+        assertEquals(36002, actual.getProductId());
+        assertEquals(BigDecimal.valueOf(10.0), actual.getPrice());
+        assertEquals(LocalDateTime.parse("2023-01-01T00:00:00", formatter), actual.getStartDate());
+        assertEquals(LocalDateTime.parse("2023-01-01T23:59:59", formatter), actual.getEndDate());
+    }
+
+    @Test
+    @DisplayName("Test 14: update error brand inexistente")
+    void update_price_error() {
+        var dto = getCreatePriceRequestDTO(4);
+        var exception = assertThrows(CustomException.class, () -> service.updatePrice(7, dto));
+        assertEquals(properties.getStatusMessage(ServicePropertyConst.BRAND_NO_EXISTENTE), exception.getMessage());
+    }
+
+    private static CreatePriceRequestDTO getCreatePriceRequestDTO(int brandId) {
+        var dto = CreatePriceRequestDTO
+                .builder()
+                .price(BigDecimal.valueOf(10.0))
+                .brandId(brandId)
+                .startDate("20230101000000")
+                .endDate("20230101235959")
+                .priceList(3)
+                .productId(36002)
+                .priority(1)
+                .curr("EUR")
+                .build();
+        return dto;
     }
 
 
