@@ -15,5 +15,5 @@ public interface PricesService {
 
     PriceDTO updatePrice(int id, CreatePriceRequestDTO priceDTO);
 
-    List<PriceDTO> findAll(String date, String productId, String brandId) throws Exception;
+    List<PriceDTO> findAll(String date, String productId, String brandId, Boolean orderByPriority) throws Exception;
 }

@@ -19,14 +19,6 @@ public class ServiceProperties {
 
     private String statusOkMessage;
 
-    public String getStatusOkMessage() {
-        return statusOkMessage;
-    }
-
-    public void setStatusOkMessage(String statusOkMessage) {
-        this.statusOkMessage = statusOkMessage;
-    }
-
     private static final String DEFAULT_MESSAGE = "NOT CONFIGURED THIS STATUS CODE IN PROPERTIES: ";
 
     public String getStatusMessage(final Integer idStatus) {

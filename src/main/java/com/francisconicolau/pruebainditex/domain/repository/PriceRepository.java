@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PricesRepository extends JpaRepository<Price, Integer>, JpaSpecificationExecutor<Price> {
+public interface PriceRepository extends JpaRepository<Price, Integer>, JpaSpecificationExecutor<Price> {
 
 /*    @Query(
             value= "SELECT new com.francisconicolau.pruebainditex.application.dto.PricesDTO from Prices where :date BETWEEN start_date AND end_date " +

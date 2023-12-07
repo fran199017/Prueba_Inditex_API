@@ -6,7 +6,8 @@ import com.francisconicolau.pruebainditex.application.exception.CustomException;
 import com.francisconicolau.pruebainditex.application.service.PricesService;
 import com.francisconicolau.pruebainditex.domain.mappers.PricesMapper;
 import com.francisconicolau.pruebainditex.domain.model.Price;
-import com.francisconicolau.pruebainditex.domain.repository.PricesRepository;
+import com.francisconicolau.pruebainditex.domain.repository.BrandRepository;
+import com.francisconicolau.pruebainditex.domain.repository.PriceRepository;
 import com.francisconicolau.pruebainditex.infrastructure.config.ServiceProperties;
 import com.francisconicolau.pruebainditex.infrastructure.config.ServicePropertyConst;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -22,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service("pricesService")
@@ -46,7 +48,10 @@ public class PricesServiceImpl implements PricesService {
 
 
     @Autowired
-    private PricesRepository pricesRepository;
+    private PriceRepository pricesRepository;
+
+    @Autowired
+    private BrandRepository brandRepository;
 
     @Autowired
     private PricesMapper mapper;
@@ -55,9 +60,13 @@ public class PricesServiceImpl implements PricesService {
     @Autowired
     private ServiceProperties properties;
 
-    public List<PriceDTO> findAll(String date, String productId, String brandId) throws Exception {
+    public List<PriceDTO> findAll(String date, String productId, String brandId, Boolean orderByPriority) throws Exception {
         var prices = pricesRepository.findAll(getSpecifications(date, productId, brandId));
-        return prices.isEmpty() ? Collections.emptyList() : mapper.fromEntityList(prices);
+        return !orderByPriority && !prices.isEmpty()
+                ? mapper.fromEntityList(prices)
+                : mapper.fromEntityList(prices.stream()
+                .max(Comparator.comparingInt(Price::getPriority))
+                .map(Collections::singletonList).orElse(Collections.emptyList()));
     }
 
 
@@ -67,20 +76,24 @@ public class PricesServiceImpl implements PricesService {
     }
 
     public PriceDTO createNewPrice(CreatePriceRequestDTO pricesDTO) {
-        var startDate = getDateformatted(pricesDTO.getStartDate());
-        var endDate = getDateformatted(pricesDTO.getEndDate());
+        var brand = brandRepository.findById(pricesDTO.getBrandId());
+        if (brand.isPresent()) {
+            var startDate = getDateformatted(pricesDTO.getStartDate());
+            var endDate = getDateformatted(pricesDTO.getEndDate());
 
-        var price = new Price();
-        price.setBrandId(pricesDTO.getBrandId());
-        price.setStartDate(startDate);
-        price.setEndDate(endDate);
-        price.setPriceList(pricesDTO.getPriceList());
-        price.setProductId(pricesDTO.getProductId());
-        price.setPrice(pricesDTO.getPrice());
-        price.setCurr(pricesDTO.getCurr());
-        price.setPriority(pricesDTO.getPriority());
+            var price = new Price();
+            price.setBrandId(pricesDTO.getBrandId());
+            price.setStartDate(startDate);
+            price.setEndDate(endDate);
+            price.setPriceList(pricesDTO.getPriceList());
+            price.setProductId(pricesDTO.getProductId());
+            price.setPrice(pricesDTO.getPrice());
+            price.setCurr(pricesDTO.getCurr());
+            price.setPriority(pricesDTO.getPriority());
 
-        return mapper.fromEntity(pricesRepository.saveAndFlush(price));
+            return mapper.fromEntity(pricesRepository.saveAndFlush(price));
+        }
+        throw new CustomException(ServicePropertyConst.BRAND_NO_EXISTENTE, properties.getStatusMessage(ServicePropertyConst.BRAND_NO_EXISTENTE));
     }
 
     public void deletePrice(int id) {
@@ -92,22 +105,25 @@ public class PricesServiceImpl implements PricesService {
     }
 
     public PriceDTO updatePrice(int id, CreatePriceRequestDTO priceDTO) {
-        var priceOpt = pricesRepository.findById(id);
-        if (priceOpt.isPresent()) {
-            var price = priceOpt.get();
-            price.setStartDate(getDateformatted(priceDTO.getStartDate()));
-            price.setEndDate(getDateformatted(priceDTO.getEndDate()));
-            price.setPrice(priceDTO.getPrice());
-            price.setPriceList(priceDTO.getPriceList());
-            price.setPriority(priceDTO.getPriority());
-            price.setCurr(priceDTO.getCurr());
-            price.setBrandId(priceDTO.getBrandId());
-            price.setProductId(priceDTO.getProductId());
 
-            return mapper.fromEntity(pricesRepository.saveAndFlush(price));
+        var brand = brandRepository.findById(priceDTO.getBrandId());
+        if (brand.isPresent()) {
+            var priceOpt = pricesRepository.findById(id);
+            if (priceOpt.isPresent()) {
+                var price = priceOpt.get();
+                price.setStartDate(getDateformatted(priceDTO.getStartDate()));
+                price.setEndDate(getDateformatted(priceDTO.getEndDate()));
+                price.setPrice(priceDTO.getPrice());
+                price.setPriceList(priceDTO.getPriceList());
+                price.setPriority(priceDTO.getPriority());
+                price.setCurr(priceDTO.getCurr());
+                price.setBrandId(priceDTO.getBrandId());
+                price.setProductId(priceDTO.getProductId());
 
+                return mapper.fromEntity(pricesRepository.saveAndFlush(price));
+            }
         }
-        return null;
+        throw new CustomException(ServicePropertyConst.BRAND_NO_EXISTENTE, properties.getStatusMessage(ServicePropertyConst.BRAND_NO_EXISTENTE));
     }
 
     private Specification<Price> getSpecifications(String date, String productId, String brandId) throws Exception {
@@ -125,7 +141,7 @@ public class PricesServiceImpl implements PricesService {
     }
 
     /**
-     * Método que filtra segun los filtros EQYUALS, NOT EQUALS, GREATHER THAN y LESS THAN.
+     * Método que filtra segun los filtros EQUALS, NOT EQUALS, GREATHER THAN y LESS THAN.
      * <p>
      * Si el campo es startDate y el filtro es bw (BETWEEN) haremos una comparacion comprendida entre startDate y endDate
      * y sino, solo compararemos con el startDate dado que el endpoint solo admite 3 parametros.
@@ -178,7 +194,7 @@ public class PricesServiceImpl implements PricesService {
                 );
     }
 
-    public LocalDateTime getDateformatted(String date) {
+    private LocalDateTime getDateformatted(String date) {
         try {
             return LocalDateTime.parse(date, formatter);
         } catch (DateTimeParseException ex) {
