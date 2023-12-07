@@ -31,3 +31,5 @@ services:
     0: Success
     1: Error inesperado del sistema
     2: Error de formateo de fechas. Comprueba que la fecha tiene el formato yyyyMMddHHmmss
+    3: Debes aplicar un filtro para cada campo
+    4: Filtro no encontrado. Los filtros permitidos son eq, neq, gt, lt

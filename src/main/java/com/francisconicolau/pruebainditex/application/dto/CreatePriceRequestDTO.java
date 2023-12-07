@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @Data
@@ -13,6 +15,8 @@ import lombok.Setter;
 public class CreatePriceRequestDTO {
     public static final String CAMPO_NO_NULO = "Campo no nulo";
     public static final String FORMATO_FECHA = "El formato debe ser yyyyMMddHHmmss";
+    public static final String PRIORIDAD_ERROR = "La prioridad solo puede ser 0 o 1";
+    public static final String ISO_MONEDA_ERROR = "LA ISO de la moneda solo permite 3 caracteres";
 
     @NotNull(message = CAMPO_NO_NULO)
     Integer brandId;
@@ -32,15 +36,15 @@ public class CreatePriceRequestDTO {
     Integer productId;
 
     @NotNull(message = CAMPO_NO_NULO)
-    @Min(value = 0, message = "La prioridad solo puede ser 0 o 1")
-    @Max(value = 1, message = "La prioridad solo puede ser 0 o 1")
+    @Min(value = 0, message = PRIORIDAD_ERROR)
+    @Max(value = 1, message = PRIORIDAD_ERROR)
     Integer priority;
 
     @NotNull(message = CAMPO_NO_NULO)
-    float price;
+    BigDecimal price;
 
     @NotNull(message = CAMPO_NO_NULO)
-    @Size(min = 3, max = 3, message = "LA ISO de la moneda solo permite 3 caracteres")
+    @Size(min = 3, max = 3, message = ISO_MONEDA_ERROR)
     String curr;
 
 }

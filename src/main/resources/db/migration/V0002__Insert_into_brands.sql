@@ -1,2 +1,4 @@
 INSERT INTO brands (`NAME`)
-VALUES ('ZARA');
+VALUES
+('ZARA'),
+('LEFTIES');

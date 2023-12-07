@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "brands")
 @JsonSerialize()
-public class Brands {
+public class Brand {
 
     @Id
     @Column(name = "ID", nullable = false)

@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "prices")
-public class Prices {
+public class Price {
 
     @Id
 //    @ApiModelProperty(value = "ID", required = true)
@@ -42,7 +43,7 @@ public class Prices {
     int priority;
 
     @Column(name = "PRICE", nullable = false)
-    float price;
+    BigDecimal price;
 
     @Column(name = "CURR", nullable = false)
     String curr;

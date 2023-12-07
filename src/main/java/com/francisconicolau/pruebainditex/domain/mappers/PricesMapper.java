@@ -1,8 +1,8 @@
 package com.francisconicolau.pruebainditex.domain.mappers;
 
 
-import com.francisconicolau.pruebainditex.application.dto.PricesDTO;
-import com.francisconicolau.pruebainditex.domain.model.Prices;
+import com.francisconicolau.pruebainditex.application.dto.PriceDTO;
+import com.francisconicolau.pruebainditex.domain.model.Price;
 import org.mapstruct.Mapper;
 
 import org.mapstruct.Mapping;
@@ -16,7 +16,7 @@ public interface PricesMapper {
     PricesMapper INSTANCE = Mappers.getMapper(PricesMapper.class);
 
     @Mapping(target = "productoId", source = "productId")
-    PricesDTO fromEntity(Prices entity);
+    PriceDTO fromEntity(Price entity);
 
-    List<PricesDTO> fromEntityList(List<Prices> entities);
+    List<PriceDTO> fromEntityList(List<Price> entities);
 }

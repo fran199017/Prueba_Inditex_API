@@ -1,8 +1,8 @@
 package com.francisconicolau.pruebainditex.domain.mappers.impl;
 
-import com.francisconicolau.pruebainditex.application.dto.PricesDTO;
+import com.francisconicolau.pruebainditex.application.dto.PriceDTO;
 import com.francisconicolau.pruebainditex.domain.mappers.PricesMapper;
-import com.francisconicolau.pruebainditex.domain.model.Prices;
+import com.francisconicolau.pruebainditex.domain.model.Price;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -12,12 +12,12 @@ import java.util.List;
 public class PricesMapperImpl implements PricesMapper {
 
     @Override
-    public PricesDTO fromEntity(Prices e) {
+    public PriceDTO fromEntity(Price e) {
         if (e == null) {
             return null;
         }
 
-        return PricesDTO.builder()
+        return PriceDTO.builder()
                 .productId(e.getProductId())
                 .brandId(e.getBrandId())
                 .startDate(e.getStartDate())
@@ -29,14 +29,14 @@ public class PricesMapperImpl implements PricesMapper {
     }
 
     @Override
-    public List<PricesDTO> fromEntityList(List<Prices> e) {
+    public List<PriceDTO> fromEntityList(List<Price> e) {
         if (e == null) {
             return null;
         }
 
-        var list = new ArrayList<PricesDTO>(e.size());
-        for (Prices prices : e) {
-            list.add(fromEntity(prices));
+        var list = new ArrayList<PriceDTO>(e.size());
+        for (Price price : e) {
+            list.add(fromEntity(price));
         }
         return list;
     }
