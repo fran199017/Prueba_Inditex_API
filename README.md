@@ -63,10 +63,10 @@ http://localhost:8080/api/v1/prices/{id}
 ### Ejemplos findAll ( el endpoint de la prueba)
 Test 1: petición a las 10:00 del día 14 del producto 35455 para la brand 1 (ZARA)
 ![img_1.png](src/main/resources/img/img_1.png)
-Test 2: petición a las 16:00 del día 14 del producto 35455 para la brand 1 (ZARA) y su respuesta (devuelve ambos elementos)
+Test 2: petición a las 16:00 del día 14 del producto 35455 para la brand 1 (ZARA) y su respuesta 
 ![img_2.png](src/main/resources/img/img_2.png)
 ![img_5.png](src/main/resources/img/img_5.png)
-- Test 2 pero sin tener en cuenta la prioridad (variable a FALSE) y su respuesta
+- Test 2 pero sin tener en cuenta la prioridad y su respuesta(devuelve ambos elementos, al haber puesto la variable de prioridad a FALSE)
 ![img_3.png](src/main/resources/img/img_3.png)
 ![img_4.png](src/main/resources/img/img_4.png)
 - Otro ejemplo cualquiera válido
