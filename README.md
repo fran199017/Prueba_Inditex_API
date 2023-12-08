@@ -31,7 +31,7 @@ búsquedas con cualquier filtro que el usuario desease asignar y no solo lo que 
 
 ### BBDD H2 instrucciones
 - URL: http://localhost:8080/h2-console
-- url: jdbc:h2:mem:testdb
+- bbdd: jdbc:h2:mem:testdb
 - username: sa
 - password:
 
