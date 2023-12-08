@@ -1,7 +1,7 @@
 package com.francisconicolau.pruebainditex.domain.mappers.impl;
 
 import com.francisconicolau.pruebainditex.application.dto.PriceDTO;
-import com.francisconicolau.pruebainditex.domain.mappers.PricesMapper;
+import com.francisconicolau.pruebainditex.domain.mappers.PriceMapper;
 import com.francisconicolau.pruebainditex.domain.model.Price;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-public class PricesMapperImpl implements PricesMapper {
+public class PriceMapperImpl implements PriceMapper {
 
     @Override
     public PriceDTO fromEntity(Price e) {
@@ -25,7 +25,7 @@ public class PricesMapperImpl implements PricesMapper {
                 .endDate(e.getEndDate())
                 .priceList(e.getPriceList())
                 .priority(e.getPriority())
-                .price(e.getPrice())
+                .price(e.getPrecio())
                 .build();
     }
 

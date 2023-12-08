@@ -1,16 +1,33 @@
-## Prices API - Prueba Inditex
+## Prueba_Inditex_API
 ### Descripción general
-API basada en la prueba de Inditex bajo arquitectura hexagonal, con version Java 17 y Spring 3.2.0, bbdd H2 y OpenAPI para la realización de pruebas y manejo de excepciones.
+API basada en la prueba de Inditex bajo arquitectura hexagonal, Java 17 y Spring 3.2.0, bbdd H2, RedisCache,
+OpenAPI para la realización de pruebas y manejo de excepciones.
+### Tecnologías Utilizadas
+- Java 17
+- Spring Boot
+- H2
+- RedisCache
+- OpenAPI
+- Flyway migration
+### Requisitos
+- Java 17
+- Redis Server (instrucciones rápidas más abajo)
+- Maven
 ### Notas sobre el proyecto
 - He querido centrarme en el endpoint de la prueba bajo las instrucciones de entrada y salida que se pide en la prueba.
 - También lo he querido realizar de la manera más versátil y genérica posible, para que este mismo endpoint sirviese para realizar
 búsquedas con cualquier filtro que el usuario desease asignar y no solo lo que pide la prueba.
-- He considerado omitir la lógica de servicio de la entity Brand, dado que sería repetir información innecesariamente para la prueba.
+- He considerado omitir la lógica de servicio de la entity Brand, para no repetir información innecesaria para la prueba.
 ### Pautas a seguir
 - Hacer git clone https://github.com/fran199017/Prueba_Inditex_API.git
 - Abrir el proyecto en la raiz ../pruebainditex
 - Hacer mvn clean package
 - Ejecutar java -jar target/pruebainditex-0.0.1-SNAPSHOT.jar
+### Pautas a seguir para RedisCache
+- Descargar y descomprimir el .zip (en Windows) https://github.com/microsoftarchive/redis/releases
+- Ejecutar redis-cli.exe para levantar el server en el puerto por defecto.
+- Para verificar que efectivamente se ha guardado informacion tras la petición se puede utilizar redis-cli-exe
+- Usar el comando GET id (del elemento guardado). Ejemplo al final del Readme.
 
 ### BBDD H2 instrucciones
 - URL: http://localhost:8080/h2-console
@@ -21,7 +38,7 @@ búsquedas con cualquier filtro que el usuario desease asignar y no solo lo que 
 ### Swagger URL
 http://localhost:8080/swagger-ui/index.html
 
-### Endpoint de la prueba
+### Endpoint de la prueba (hay ejemplos al final del readme)
 http://localhost:8080/swagger-ui/index.html#/prices-controller/findAll
 - NOTA: Si se utiliza alguna otro endpoint, los tests podrían fallar al haber cambiado campos de la prueba.
 1) Para este endpoint (aunque queda explicado en OpenAPI), todos los campos son String, para poder aplicarles ciertos filtros y orderByPriority si se desea filtrar por prioridad o no para mayor flexibilidad al endpoint.
@@ -30,6 +47,10 @@ http://localhost:8080/swagger-ui/index.html#/prices-controller/findAll
 endDate o ambos pero he querido realizar la prueba lo más ajustada posible pero haciéndola versátil).
 4) Otro ejemplo de fecha podría ser bw:20221215000000 que realizará una bésqueda entre los campos startDate y endDate.
 
+### Endpoint findById
+http://localhost:8080/api/v1/prices/{id}
+- NOTA: Tiene una implementación con RedisCache para realizar consultadas cacheadas en Redis. 
+(explicado en el apartado de Redis)
 ### Resto de endpoints
 - Son opcionales en la prueba pero los he insertado porque forman parte de una API REST. Para los campos fecha siguen el mismo formato yyyyMMddHHmmss.
 
@@ -38,5 +59,24 @@ endDate o ambos pero he querido realizar la prueba lo más ajustada posible pero
 - Se puede probar a no aplicar ningun filtro en el findAll ->  Ejemplo yyyyMMddHHmmss
 - Se puede probar a aplicar una fecha "válida" para el @RequestBody pero inválida en conversión -> Ejemplo: eq:20210632000000 (día 32)
 - Se puede probar a insertar como brandId (foreign key de Prices) una brandId inexistente -> Ejemplo brandId:5
+
+### Ejemplos findAll ( el endpoint de la prueba)
+Test 1: petición a las 10:00 del día 14 del producto 35455 para la brand 1 (ZARA)
+![img_1.png](src/main/resources/img/img_1.png)
+Test 2: petición a las 16:00 del día 14 del producto 35455 para la brand 1 (ZARA) y su respuesta (devuelve ambos elementos)
+![img_2.png](src/main/resources/img/img_2.png)
+![img_5.png](src/main/resources/img/img_5.png)
+- Test 2 pero sin tener en cuenta la prioridad (variable a FALSE) y su respuesta
+![img_3.png](src/main/resources/img/img_3.png)
+![img_4.png](src/main/resources/img/img_4.png)
+- Otro ejemplo cualquiera válido
+![img.png](src/main/resources/img/img.png)
+- Ejemplo sin filtro ninguno, devuelve todos los elementos
+![img_6.png](src/main/resources/img/img_6.png) ![img_7.png](src/main/resources/img/img_7.png)
+- 
+### Ejemplos Redis cache
+![img.png](src/main/resources/img/img1.png)
+![img.png](src/main/resources/img/img2.png)
+![img.png](src/main/resources/img/img3.png)
 
 

@@ -42,7 +42,7 @@ public class Price {
     int priority;
 
     @Column(name = "PRICE", nullable = false)
-    BigDecimal price;
+    BigDecimal precio;
 
     @Column(name = "CURR", nullable = false)
     String curr;

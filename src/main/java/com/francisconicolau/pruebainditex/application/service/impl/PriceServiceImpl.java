@@ -3,8 +3,8 @@ package com.francisconicolau.pruebainditex.application.service.impl;
 import com.francisconicolau.pruebainditex.application.dto.CreatePriceRequestDTO;
 import com.francisconicolau.pruebainditex.application.dto.PriceDTO;
 import com.francisconicolau.pruebainditex.application.exception.CustomException;
-import com.francisconicolau.pruebainditex.application.service.PricesService;
-import com.francisconicolau.pruebainditex.domain.mappers.PricesMapper;
+import com.francisconicolau.pruebainditex.application.service.PriceService;
+import com.francisconicolau.pruebainditex.domain.mappers.PriceMapper;
 import com.francisconicolau.pruebainditex.domain.model.Price;
 import com.francisconicolau.pruebainditex.domain.repository.BrandRepository;
 import com.francisconicolau.pruebainditex.domain.repository.PriceRepository;
@@ -27,7 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service("pricesService")
-public class PricesServiceImpl implements PricesService {
+public class PriceServiceImpl implements PriceService {
 
     private static final String DATE_FORMAT = "yyyyMMddHHmmss";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
@@ -54,7 +54,7 @@ public class PricesServiceImpl implements PricesService {
     private BrandRepository brandRepository;
 
     @Autowired
-    private PricesMapper mapper;
+    private PriceMapper mapper;
 
     @Getter
     @Autowired
@@ -70,9 +70,12 @@ public class PricesServiceImpl implements PricesService {
     }
 
 
-    public PriceDTO getById(int id) {
+    public PriceDTO findById(int id) {
         var pricesOpt = pricesRepository.findById(id);
-        return pricesOpt.isEmpty() ? null : mapper.fromEntity(pricesOpt.get());
+        if (pricesOpt.isEmpty()){
+            throw new CustomException(ServicePropertyConst.PRECIO_NO_EXISTENTE, properties.getStatusMessage(ServicePropertyConst.PRECIO_NO_EXISTENTE));
+        }
+        return mapper.fromEntity(pricesOpt.get());
     }
 
     public PriceDTO createNewPrice(CreatePriceRequestDTO pricesDTO) {
@@ -87,7 +90,7 @@ public class PricesServiceImpl implements PricesService {
             price.setEndDate(endDate);
             price.setPriceList(pricesDTO.getPriceList());
             price.setProductId(pricesDTO.getProductId());
-            price.setPrice(pricesDTO.getPrice());
+            price.setPrecio(pricesDTO.getPrice());
             price.setCurr(pricesDTO.getCurr());
             price.setPriority(pricesDTO.getPriority());
 
@@ -102,6 +105,7 @@ public class PricesServiceImpl implements PricesService {
             var price = priceOpt.get();
             pricesRepository.delete(price);
         }
+        throw new CustomException(ServicePropertyConst.PRECIO_NO_EXISTENTE, properties.getStatusMessage(ServicePropertyConst.PRECIO_NO_EXISTENTE));
     }
 
     public PriceDTO updatePrice(int id, CreatePriceRequestDTO priceDTO) {
@@ -113,7 +117,7 @@ public class PricesServiceImpl implements PricesService {
                 var price = priceOpt.get();
                 price.setStartDate(getDateformatted(priceDTO.getStartDate()));
                 price.setEndDate(getDateformatted(priceDTO.getEndDate()));
-                price.setPrice(priceDTO.getPrice());
+                price.setPrecio(priceDTO.getPrice());
                 price.setPriceList(priceDTO.getPriceList());
                 price.setPriority(priceDTO.getPriority());
                 price.setCurr(priceDTO.getCurr());
@@ -122,6 +126,7 @@ public class PricesServiceImpl implements PricesService {
 
                 return mapper.fromEntity(pricesRepository.saveAndFlush(price));
             }
+            throw new CustomException(ServicePropertyConst.PRECIO_NO_EXISTENTE, properties.getStatusMessage(ServicePropertyConst.PRECIO_NO_EXISTENTE));
         }
         throw new CustomException(ServicePropertyConst.BRAND_NO_EXISTENTE, properties.getStatusMessage(ServicePropertyConst.BRAND_NO_EXISTENTE));
     }
@@ -157,14 +162,10 @@ public class PricesServiceImpl implements PricesService {
             var fieldSeparated = fieldValue.split(DOS_PUNTOS);
             var filter = fieldSeparated[0];
 
-
             if (START_DATE.equals(fieldName) && BETWEEN.equals(filter)) {
                 return compareBetweenFilterForStartDateAndEndDate(fieldSeparated);
             } else {
-                var value = START_DATE.equals(fieldName)
-                        ? getDateformatted(fieldSeparated[1])
-                        : fieldSeparated[1];
-
+                var value = START_DATE.equals(fieldName) ? getDateformatted(fieldSeparated[1]) : fieldSeparated[1];
                 return switch (filter) {
                     case FILTER_EQUALS -> (Root<Price> root, CriteriaQuery<?> cq, CriteriaBuilder cb) ->
                             cb.equal(root.get(fieldName), value);
@@ -178,15 +179,12 @@ public class PricesServiceImpl implements PricesService {
                             throw new CustomException(ServicePropertyConst.FILTRO_NO_ENCONTRADO, properties.getStatusMessage(ServicePropertyConst.FILTRO_NO_ENCONTRADO));
                 };
             }
-
         }
         throw new CustomException(ServicePropertyConst.NO_FILTRO, properties.getStatusMessage(ServicePropertyConst.NO_FILTRO));
     }
 
     private Specification<Price> compareBetweenFilterForStartDateAndEndDate(String[] fieldSeparated) {
-
         var value = getDateformatted(fieldSeparated[1]);
-
         return (Root<Price> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
                 cb.and(
                         cb.lessThanOrEqualTo(root.get(START_DATE), value),
@@ -200,6 +198,5 @@ public class PricesServiceImpl implements PricesService {
         } catch (DateTimeParseException ex) {
             throw new CustomException(ServicePropertyConst.DATE_FORMAT_ERROR, properties.getStatusMessage(ServicePropertyConst.DATE_FORMAT_ERROR));
         }
-
     }
 }

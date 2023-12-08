@@ -6,9 +6,9 @@ import com.francisconicolau.pruebainditex.application.exception.CustomException;
 
 import java.util.List;
 
-public interface PricesService {
+public interface PriceService {
 
-    PriceDTO getById(int id);
+    PriceDTO findById(int id);
 
     PriceDTO createNewPrice(CreatePriceRequestDTO pricesDTO);
 

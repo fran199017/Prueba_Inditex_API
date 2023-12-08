@@ -8,6 +8,7 @@ server:
     protocol-header: x-forwarded-proto
 
 debug: true
+
 spring:
   h2:
     console:
@@ -23,6 +24,10 @@ spring:
     password:
     hikari:
       auto-commit: false
+  redis:
+    host: localhost
+    port: 6379
+
 flyway:
   baseline-on-migrate: true
 
@@ -33,3 +38,5 @@ services:
     3: Debes aplicar un filtro para cada campo
     4: Filtro no encontrado. Los filtros permitidos son eq, neq, gt, lt y bw (solo para las fechas)
     5: La brand seleccionada no existe. Comprueba los datos de entrada
+    6: Error JsonProcessingException en RedisService
+    7: Precio no encontrado

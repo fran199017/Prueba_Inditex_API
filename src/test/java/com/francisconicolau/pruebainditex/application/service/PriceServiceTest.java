@@ -2,7 +2,7 @@ package com.francisconicolau.pruebainditex.application.service;
 
 import com.francisconicolau.pruebainditex.application.dto.CreatePriceRequestDTO;
 import com.francisconicolau.pruebainditex.application.exception.CustomException;
-import com.francisconicolau.pruebainditex.application.service.impl.PricesServiceImpl;
+import com.francisconicolau.pruebainditex.application.service.impl.PriceServiceImpl;
 import com.francisconicolau.pruebainditex.infrastructure.config.ServiceProperties;
 import com.francisconicolau.pruebainditex.infrastructure.config.ServicePropertyConst;
 import jakarta.transaction.Transactional;
@@ -24,9 +24,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @Transactional
-class PricesServiceTest {
+class PriceServiceTest {
     @Autowired
-    private PricesServiceImpl service;
+    private PriceServiceImpl service;
 
     @Getter
     @Autowired
@@ -230,7 +230,7 @@ class PricesServiceTest {
     @Test
     @DisplayName("Test 9: by id OK")
     void get_by_id_ok() {
-        var actual = service.getById(1);
+        var actual = service.findById(1);
         assertEquals(1, actual.getBrandId());
         assertEquals(35455, actual.getProductId());
         assertEquals(BigDecimal.valueOf(35.5), actual.getPrice());
@@ -241,8 +241,8 @@ class PricesServiceTest {
     @Test
     @DisplayName("Test 10: by id not found")
     void get_by_id_not_found() {
-        var actual = service.getById(100);
-        assertNull(actual);
+        CustomException exception = assertThrows(CustomException.class, () -> service.findById(100));
+        assertEquals(properties.getStatusMessage(ServicePropertyConst.PRECIO_NO_EXISTENTE), exception.getMessage());
     }
 
     @Test
