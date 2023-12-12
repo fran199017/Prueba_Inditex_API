@@ -168,7 +168,7 @@ public class PriceServiceImpl implements PriceService {
             }
             query.orderBy(cb.desc(root.get(PRIORITY)));
             var queryResult = entityManager.createQuery(query).setMaxResults(1).getResultList();
-            return cb.equal(root, queryResult.get(0));
+            return queryResult.isEmpty() ? null : cb.equal(root, queryResult.get(0));
         };
     }
 
