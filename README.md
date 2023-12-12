@@ -22,6 +22,7 @@ búsquedas con cualquier filtro que el usuario desease asignar y no solo lo que 
 - Hacer git clone https://github.com/fran199017/Prueba_Inditex_API.git
 - Abrir el proyecto en la raiz ../pruebainditex
 - Hacer mvn clean package
+- mvn clean test ( para ver el coverage de Jacoco situado en target/site/jacoco/index.html)
 - Ejecutar java -jar target/pruebainditex-0.0.1-SNAPSHOT.jar
 ### Pautas a seguir para RedisCache
 - Descargar y descomprimir el .zip (en Windows) https://github.com/microsoftarchive/redis/releases

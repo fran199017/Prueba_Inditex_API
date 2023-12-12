@@ -10,6 +10,9 @@ import com.francisconicolau.pruebainditex.domain.repository.BrandRepository;
 import com.francisconicolau.pruebainditex.domain.repository.PriceRepository;
 import com.francisconicolau.pruebainditex.infrastructure.config.ServiceProperties;
 import com.francisconicolau.pruebainditex.infrastructure.config.ServicePropertyConst;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
@@ -23,7 +26,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 @Service("pricesService")
@@ -45,6 +47,7 @@ public class PriceServiceImpl implements PriceService {
     public static final String PRODUCT_ID = "productId";
     public static final String BRAND_ID = "brandId";
     public static final String END_DATE = "endDate";
+    public static final String PRIORITY = "priority";
 
 
     @Autowired
@@ -60,19 +63,19 @@ public class PriceServiceImpl implements PriceService {
     @Autowired
     private ServiceProperties properties;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     public List<PriceDTO> findAll(String date, String productId, String brandId, boolean orderByPriority) throws CustomException {
-        var prices = pricesRepository.findAll(getSpecifications(date, productId, brandId));
-        return !orderByPriority && !prices.isEmpty()
-                ? mapper.fromEntityList(prices)
-                : mapper.fromEntityList(prices.stream()
-                .max(Comparator.comparingInt(Price::getPriority))
-                .map(Collections::singletonList).orElse(Collections.emptyList()));
+        var prices = pricesRepository.findAll(getSpecifications(date, productId, brandId, orderByPriority));
+        return !prices.isEmpty() ? mapper.fromEntityList(prices) : Collections.emptyList();
+
     }
 
 
     public PriceDTO findById(int id) {
         var pricesOpt = pricesRepository.findById(id);
-        if (pricesOpt.isEmpty()){
+        if (pricesOpt.isEmpty()) {
             throw new CustomException(ServicePropertyConst.PRECIO_NO_EXISTENTE, properties.getStatusMessage(ServicePropertyConst.PRECIO_NO_EXISTENTE));
         }
         return mapper.fromEntity(pricesOpt.get());
@@ -131,7 +134,7 @@ public class PriceServiceImpl implements PriceService {
         throw new CustomException(ServicePropertyConst.BRAND_NO_EXISTENTE, properties.getStatusMessage(ServicePropertyConst.BRAND_NO_EXISTENTE));
     }
 
-    private Specification<Price> getSpecifications(String date, String productId, String brandId) throws CustomException {
+    private Specification<Price> getSpecifications(String date, String productId, String brandId, boolean orderByPriority) throws CustomException {
         List<Specification<Price>> specifications = new ArrayList<>();
         if (date != null && !date.isEmpty()) {
             specifications.add(splitFilterAndGetSpec(date, START_DATE));
@@ -142,7 +145,33 @@ public class PriceServiceImpl implements PriceService {
         if (brandId != null && !brandId.isEmpty()) {
             specifications.add(splitFilterAndGetSpec(brandId, BRAND_ID));
         }
+
+        // Si la consulta viene ordenada por prioridad filtramos los resultados por prioridad 1.
+        if (orderByPriority) {
+            return getOrderByPriority(specifications);
+        }
         return specifications.stream().reduce(Specification::and).orElse(null);
+    }
+
+    /**
+     * Método que combina los filtros anteriores para generar una query y filtrar por prioridad a 1 y devolver el resultado, en este caso 1
+     * unico elemento.
+     * @param specifications Filtros anteriores.
+     * @return
+     */
+    private Specification<Price> getOrderByPriority(List<Specification<Price>> specifications) {
+        var combinedSpecification = specifications.stream().reduce(Specification::and).orElse(null);
+
+        return (root, query, cb) -> {
+            if (combinedSpecification != null) {
+                query.where(combinedSpecification.toPredicate(root, query, cb));
+            }
+            query.orderBy(cb.desc(root.get(PRIORITY)));
+            var typedQuery = (TypedQuery<Price>) entityManager.createQuery(query);
+            typedQuery.setMaxResults(1);
+            var results = typedQuery.getResultList();
+            return results.isEmpty() ? null : cb.equal(root, results.get(0));
+        };
     }
 
     /**
