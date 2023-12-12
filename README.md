@@ -41,6 +41,10 @@ http://localhost:8080/swagger-ui/index.html
 
 ### Endpoint de la prueba (hay ejemplos al final del readme)
 http://localhost:8080/swagger-ui/index.html#/prices-controller/findAll
+#### NOTA IMPORTANTE!!
+- Se ha decidido utilizar cuando se filtra por priority a TRUE el entityManager para realizar la consulta porque tras analizar la prueba y realizar
+  los Specification vi, que había que filtrar el resultado a 1 elemento, con la imposibilidad de hacer un LIMIT al Specification y escogiendo em para
+  coger esos filtros y realizar la query. Obviamente sería mas eficiente hacer un @Query, pero he querido hacer un endpoint que sea muy versátil a la hora de realizar pruebas y encontrandome con este problema despues de ver que habia que filtrar a 1 único resultado.
 - NOTA: Si se utiliza alguna otro endpoint, los tests podrían fallar al haber cambiado campos de la prueba.
 1) Para este endpoint (aunque queda explicado en OpenAPI), todos los campos son String, para poder aplicarles ciertos filtros y orderByPriority si se desea filtrar por prioridad o no para mayor flexibilidad al endpoint.
 2) Los filtros son los siguientes: eq:, neq:, lt:, gt:, y bw: (este último solo para fechas).
