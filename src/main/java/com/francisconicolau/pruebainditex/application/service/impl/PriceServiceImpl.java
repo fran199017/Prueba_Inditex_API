@@ -12,7 +12,6 @@ import com.francisconicolau.pruebainditex.infrastructure.config.ServicePropertie
 import com.francisconicolau.pruebainditex.infrastructure.config.ServicePropertyConst;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
@@ -156,6 +155,7 @@ public class PriceServiceImpl implements PriceService {
     /**
      * Método que combina los filtros anteriores para generar una query y filtrar por prioridad a 1 y devolver el resultado, en este caso 1
      * unico elemento.
+     *
      * @param specifications Filtros anteriores.
      * @return
      */
@@ -167,10 +167,8 @@ public class PriceServiceImpl implements PriceService {
                 query.where(combinedSpecification.toPredicate(root, query, cb));
             }
             query.orderBy(cb.desc(root.get(PRIORITY)));
-            var typedQuery = (TypedQuery<Price>) entityManager.createQuery(query);
-            typedQuery.setMaxResults(1);
-            var results = typedQuery.getResultList();
-            return results.isEmpty() ? null : cb.equal(root, results.get(0));
+            var queryResult = entityManager.createQuery(query).setMaxResults(1).getResultList();
+            return cb.equal(root, queryResult.get(0));
         };
     }
 
